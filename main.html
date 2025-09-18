@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dubai Knowledge Park Walking Map (UOWD & Block 19 with Popups)</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 100vh;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      function initMap() {
+        // Center map
+        var center = { lat: 25.1023, lng: 55.1628 };
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 19,
+          center: center
+        });
+
+        // UOWD and Block 19 markers
+        var uowd = { lat: 25.101828762227075, lng: 55.162701351427174 };
+        var block19 = { lat: 25.102726821418532, lng: 55.162863594169266 };
+
+        [
+          { pos: uowd, label: 'UOWD' },
+          { pos: block19, label: 'Block 19' }
+        ].forEach(function(b) {
+          new google.maps.Marker({ position: b.pos, map: map, title: b.label });
+        });
+
+        // Walking route
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer({ map: map, suppressMarkers: true });
+
+        directionsService.route(
+          {
+            origin: uowd,
+            destination: block19,
+            travelMode: google.maps.TravelMode.WALKING
+          },
+          (response, status) => {
+            if (status === 'OK') {
+              directionsRenderer.setDirections(response);
+            } else {
+              alert('Directions request failed: ' + status);
+            }
+          }
+        );
+
+        // Popup pictures coordinates
+        var popups = [
+          { coords: { lat: 25.10270552525919, lng: 55.161818110972234 }, img: 'image2.jpg', title: 'Popup 2' },
+          { coords: { lat: 25.102480785269993, lng: 55.16250060802123 }, img: 'image3.jpg', title: 'Popup 3' },
+        ];
+
+        popups.forEach(function(p) {
+          var marker = new google.maps.Marker({ position: p.coords, map: map });
+          var infowindow = new google.maps.InfoWindow({
+            content: `<div><strong>${p.title}</strong><br><img src='${p.img}' width='200'></div>`
+          });
+          marker.addListener('click', function() {
+            infowindow.open(map, marker);
+          });
+        });
+      }
+    </script>
+
+    <!-- Replace YOUR_API_KEY with your actual Google Maps API key -->
+    <script async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCAF7lxyOen7FpCpyGSd-8-jk6V_ywE_4&callback=initMap">
+    </script>
+  </body>
+</html>
